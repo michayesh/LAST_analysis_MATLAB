@@ -75,28 +75,33 @@ function [Result] = findMeasureOutFocusAnnulus_m(Image, Args)
         SizeIm   = size(SubImage);
         
         
-
-        [Pos,FI, Back] = ...
+%********Micha 
+            %[Pos,FI, Back] = imUtil.sources.findRings_m(SubImage, 'CalcBack',true, 'Threshold', Args.Threshold,...
+            % 'RingsTempBank',Args.RingsTempBank);
+            % Here with different background estimation function
+        [Pos,FI, Back] = ...            
             imUtil.sources.findRings(SubImage, 'CalcBack',true, 'Threshold', Args.Threshold,...
-            'RingsTempBank',Args.RingsTempBank);
+                'FunBackVar', @imUtil.background.modeVar_SampleHist,'RingsTempBank',Args.RingsTempBank);
+%*******Micha
         %[X,Y,SN,ImageIndex,LinaerIndexIn2D].
-        if Args.ShowFigs
-            SubImgStr = sprintf("Subimage-Back %d",Isub);
-            fig0 = figure('Name',SubImgStr, 'NumberTitle', 'off', ...
-                   'Position', [50 50 500,1050]);
-            img = SubImage-Back;
-            climits = prctile(img(:), [5, 95]);
-            imshow(img,climits);
-        end
+        % if Args.ShowFigs
+        %     SubImgStr = sprintf("Subimage-Back %d",Isub);
+        %     fig0 = figure('Name',SubImgStr, 'NumberTitle', 'off', ...
+        %            'Position', [50 50 500,1050]);
+        %     img = SubImage-Back;
+        %     climits = prctile(img(:), [5, 95]);
+        %     imshow(img,climits);
+        % end
+        %*********************** Micha
         % remove positions near edge:
         Flag = Pos(:,1)>Args.MaxRad & Pos(:,2)>Args.MaxRad & Pos(:,1)<(SizeIm(2)-Args.MaxRad) & Pos(:,2)<(SizeIm(1)-Args.MaxRad);
         Pos  = Pos(Flag,:);
         % Get a percentile threshold
         RingThreshold = prctile(Pos(:,3),50);
         RingPosI = find(Pos(:,3)>=RingThreshold);
-        fprintf('Found %d ring in subImge %d',numel(RingPosI),Isub);
-        % [~,MaxI] = max(Pos(:,3));
-        % iterate on RingPosI
+        fprintf('Found %d rings in subImage %d \n',numel(RingPosI),Isub);
+        [~,MaxI] = max(Pos(:,3));
+        % iterate on RingPosI?
         [Result(Isub).RadialVec, Result(Isub).AngleVec, Result(Isub).MeanSector,...
             Result(Isub).MedianSector, Result(Isub).StdSector, Result(Isub).NSector] = ...
             radialAnnulusStatsByAngle_m(SubImage-Back, ...

@@ -24,6 +24,7 @@ function [RadiusVec, AngleVec, MeanSector, MedianSector, StdSector, NSector] = r
     %          - (StdSector) Standard deviation in each sector.
     %          - (NSector) Number of pixels in each sector.
     % Author : Eran Ofek + ChatGPT (Mar 2026)
+    % Micha added show fig
     %
     % Example:
     %   [RadiusVec, AngleVec, MeanSector, MedianSector, StdSector, NSector] = ...
@@ -73,6 +74,7 @@ function [RadiusVec, AngleVec, MeanSector, MedianSector, StdSector, NSector] = r
     AngleBin(AngleBin > NumberOfSectors) = NumberOfSectors;
 
     SubImage = double(Image(Ymin:Ymax, Xmin:Xmax));
+    % Micha *******************
     if Args.ShowFigs
             fig0 = figure('Name','Brightest ring', 'NumberTitle', 'off', ...
                    'Position', [50 50 650,550]);
@@ -81,6 +83,7 @@ function [RadiusVec, AngleVec, MeanSector, MedianSector, StdSector, NSector] = r
             colormap(gray);
             colorbar;
     end
+    %********Micha
 
     Valid = Radius <= Args.MaxRad & ...
             RadiusBin >= 1 & RadiusBin <= NumberOfRadii & ...
